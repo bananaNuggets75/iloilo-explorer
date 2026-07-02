@@ -1,86 +1,87 @@
-# Iloilo Travel Buddy
+# SuroyIloilo
 
-A local travel companion for **Iloilo City** — discover places, local food,
-jeepney routes, fares, and traveler tips in one app. Built with Flutter.
+A local travel companion for **Iloilo City** — places, local food, jeepney
+routes with honest fares, a ready-made day plan, events, and tips from
+travelers. Built with Flutter.
 
-The differentiator vs. Google Maps / Wanderlog: a **commute + fare layer** that
-tells you *which jeepney to ride and how much it costs*, plus locally-curated
-food and traveler tips.
+The differentiator vs. Google Maps / Wanderlog: the **commute and fare
+layer** — which jeep to ride, where to transfer, what to say to the driver,
+and what you'll pay.
 
-## What's inside (Phase 1 — offline MVP)
+## Sections (bottom navigation)
 
-- Search places by name, area, or food
-- Filter by category (Heritage, Food, Nature, Café, Museum…)
-- Place details with description, rating, and best time to visit
-- Local food to try near each spot
-- **How to get there** — step-by-step commute with jeepney, walk, fare & time
-- Traveler tips
-- Works fully offline (data seeded in `lib/data/seed_places.dart`)
+- **Home** — hero, feature grid, featured spots, stats, day-plan CTA
+- **Places** — curated spots with category filters, ratings, best-time and
+  local tips, plus a **Get directions** flow
+- **Food** — signature Ilonggo dishes, where to get them, price ranges and
+  must-try picks
+- **Rides** — fare basics plus step-by-step commute routes (jeep sign to
+  look for, fare, time, transfer notes)
+- **Plan** — a full heritage day itinerary with timings and jeep fares
+- **Community** — highlighted events and traveler tips
+
+### Get directions (Maps placeholder)
+
+Tapping **Get directions** on a place opens a sheet with a from → to plan,
+the matching ride/fare guide, and an "Open in Google Maps" hand-off using a
+keyless maps URL. The in-sheet map is a **placeholder** — live, Grab-style
+in-app navigation (current location → destination with the route drawn on
+the map) comes once Google Maps API credentials are added.
 
 ## Project structure
 
 ```
 lib/
-  main.dart                     App entry + theme
-  models/place.dart             Domain models (Place, CommuteGuide, RouteStep…)
-  data/seed_places.dart         Hand-seeded Iloilo data (edit me!)
+  main.dart                    App shell: brand header, bottom nav, tabs
+  theme.dart                   Colors, typography, shared UI building blocks
+  models.dart                  Place, FoodSpot, CommuteRoute, Event, tips...
+  data/seed_data.dart          Offline pilot content (edit me!)
   screens/
-    home_screen.dart            Search + filter + list
-    place_detail_screen.dart    Commute/fare breakdown, food, tips
+    home_tab.dart              Home
+    places_tab.dart            Places + category filters
+    food_tab.dart              Food
+    commute_tab.dart           Rides (fare basics + routes)
+    itinerary_tab.dart         Plan (day itinerary timeline)
+    community_tab.dart         Community (events + tips)
   widgets/
-    place_card.dart             List card
+    directions_sheet.dart      Get-directions sheet + Maps placeholder
 ```
 
 ## Run it
 
-This repo contains the Dart sources (`lib/`) and `pubspec.yaml`. The native
-platform folders (`android/`, `ios/`) are not checked in, so generate them
-once on your machine:
+The native platform folders (`android/`, `ios/`, etc.) are not checked in;
+generate them once, then run:
 
 ```bash
-flutter create .        # adds android/, ios/, etc. without touching lib/
+flutter create .     # adds platform folders without touching lib/
 flutter pub get
-flutter run
+flutter run -d chrome        # quickest way to test
 ```
 
-Requires the Flutter SDK (3.3+). If you're new: https://docs.flutter.dev/get-started/install
+For the Android emulator: `flutter emulators --launch <id>` then
+`flutter run`. Run `flutter doctor` if a platform is missing.
 
-## Testing on a simulator
+## Editing content
 
-### iOS Simulator (macOS only)
+All pilot content lives in `lib/data/seed_data.dart` — places, food, routes,
+the day plan, events and tips. Copy an existing entry and edit; the UI
+updates automatically. This will move to Supabase so content can be managed
+remotely without shipping an app update.
 
-1. Install Xcode from the App Store, then its command-line tools:
-   `xcode-select --install`.
-2. Open a simulator: `open -a Simulator`.
-3. Confirm Flutter sees it: `flutter devices`.
-4. Run the app: `flutter run` (or press F5 / "Run" in VS Code).
+## Secrets
 
-### Android Emulator
+API keys (Supabase, Google Maps) belong in `.env.local`, which is
+git-ignored. Never commit credentials.
 
-1. Install Android Studio, then create a virtual device via
-   **Device Manager > Create Device**.
-2. List available emulators: `flutter emulators`.
-3. Launch one: `flutter emulators --launch <emulator_id>`.
-4. Run the app: `flutter run`.
+## Roadmap
 
-### Quick sanity check
+- [ ] Supabase backend: load content remotely with offline fallback
+- [ ] Admin: manage places/fares/events dynamically (Supabase table editor
+      first, custom dashboard later)
+- [ ] Google Maps: live location -> destination routing in-app (Grab-style)
+- [ ] Place detail pages with photos
+- [ ] User accounts, saved trips and user-submitted tips
+- [ ] Sponsored listings / local business dashboard (monetization)
 
-Run `flutter doctor` first — it lists anything missing (Xcode, Android SDK,
-licenses) with fix instructions.
-
-## Add your own spots
-
-Everything is driven by `lib/data/seed_places.dart`. Copy an existing `Place`
-entry and edit the fields — the UI updates automatically.
-
-## Roadmap ideas
-
-- [ ] Day-by-day itinerary builder
-- [ ] Map view (google_maps_flutter)
-- [ ] Move data to Firestore / Supabase (same `Place` models)
-- [ ] User-submitted tips & photos
-- [ ] AI trip planner ("Plan a 3-day Iloilo trip under ₱5,000")
-- [ ] Sponsored local listings & coupons (monetization)
-
-> Note: Fares/times in the seed data are rough estimates for demo purposes.
-> Verify real jeepney fares before publishing.
+> Note: fares and travel times are community estimates for demo purposes.
+> Verify current jeepney fares before publishing.

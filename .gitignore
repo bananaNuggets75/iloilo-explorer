@@ -11,6 +11,11 @@ pubspec.lock
 .vscode/
 *.iml
 
+# Secrets / environment
+.env
+.env.*
+*.env
+
 # OS
 .DS_Store
 

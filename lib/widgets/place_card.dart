@@ -54,9 +54,15 @@ class PlaceCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.directions_bus, size: 16),
                     const SizedBox(width: 6),
-                    Text('From ${cheapest.from} · '
+                    Expanded(
+                      child: Text(
+                        'From ${cheapest.from} · '
                         '₱${cheapest.totalFare.toStringAsFixed(0)} · '
-                        '${cheapest.totalMinutes} min'),
+                        '${cheapest.totalMinutes} min',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
               ],

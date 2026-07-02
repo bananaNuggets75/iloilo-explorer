@@ -2,6 +2,7 @@
 ///
 /// Keep these pure Dart (no Flutter imports) so they are easy to test and,
 /// later, to serialize to/from JSON when you add a backend or Firebase.
+library;
 
 enum PlaceCategory { heritage, food, nature, cafe, museum, shopping, viewpoint }
 

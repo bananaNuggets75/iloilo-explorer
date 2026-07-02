@@ -10,7 +10,7 @@ class IloiloTravelBuddyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final seed = const Color(0xFF00695C); // teal — feels "local + fresh"
+    const seed = Color(0xFF00695C); // teal — feels "local + fresh"
     return MaterialApp(
       title: 'Iloilo Travel Buddy',
       debugShowCheckedModeBanner: false,

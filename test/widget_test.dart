@@ -1,27 +1,28 @@
-// Smoke tests for Iloilo Travel Buddy.
+// Smoke tests for SuroyIloilo.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:iloilo_travel_buddy/main.dart';
 
 void main() {
-  testWidgets('Home screen renders header and seeded places',
+  testWidgets('App boots on the Home tab with the brand and hero',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const IloiloTravelBuddyApp());
+    await tester.pumpWidget(const SuroyIloiloApp());
+    await tester.pump();
 
-    expect(find.text('Explore Iloilo'), findsOneWidget);
-    expect(find.text('Molo Mansion'), findsWidgets);
+    expect(find.textContaining('Explore Iloilo like a local'), findsOneWidget);
+    expect(find.text('Start exploring'), findsOneWidget);
   });
 
-  testWidgets('Searching filters the place list', (WidgetTester tester) async {
-    await tester.pumpWidget(const IloiloTravelBuddyApp());
+  testWidgets('Tapping the Places tab shows the places header',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const SuroyIloiloApp());
+    await tester.pump();
 
-    await tester.enterText(find.byType(TextField), 'Batchoy');
+    await tester.tap(find.text('Places').first);
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('Batchoy'), findsWidgets);
-    // Molo Mansion has no Batchoy in its name, area, or food list.
-    expect(find.text('Molo Mansion'), findsNothing);
+    expect(find.text('Places & hidden gems'), findsOneWidget);
+    expect(find.text('Molo Mansion'), findsWidgets);
   });
 }

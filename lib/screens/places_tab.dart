@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../models.dart';
 import '../widgets/directions_sheet.dart';
 
@@ -14,11 +14,12 @@ class PlacesTab extends StatefulWidget {
 class _PlacesTabState extends State<PlacesTab> {
   PlaceCategory? _filter;
 
-  List<Place> get _visible =>
-      _filter == null ? places : places.where((p) => p.category == _filter).toList();
-
   @override
   Widget build(BuildContext context) {
+    final all = ContentScope.of(context).places;
+    final visible = _filter == null
+        ? all
+        : all.where((p) => p.category == _filter).toList();
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 32),
       children: [
@@ -32,7 +33,7 @@ class _PlacesTabState extends State<PlacesTab> {
         const SizedBox(height: 18),
         _filterChips(),
         const SizedBox(height: 18),
-        for (final p in _visible) ...[
+        for (final p in visible) ...[
           _PlaceCard(place: p),
           const SizedBox(height: 14),
         ],

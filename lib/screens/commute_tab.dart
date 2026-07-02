@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../models.dart';
 
 class CommuteTab extends StatelessWidget {
@@ -9,6 +9,7 @@ class CommuteTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
+    final routes = ContentScope.of(context).routes;
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 32),
       children: [

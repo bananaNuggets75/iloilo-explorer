@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../models.dart';
 
 class ItineraryTab extends StatelessWidget {
   const ItineraryTab({super.key});
 
-  int get _totalFare => heritageDayPlan.fold(0, (sum, s) {
+  int _totalFare(List<ItineraryStop> stops) => stops.fold(0, (sum, s) {
         final m = RegExp(r'(\d+)').firstMatch(s.fare);
         return sum + (m != null ? int.parse(m.group(1)!) : 0);
       });
 
   @override
   Widget build(BuildContext context) {
+    final stops = ContentScope.of(context).itinerary;
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 32),
       children: [
@@ -29,7 +30,7 @@ class ItineraryTab extends StatelessWidget {
           runSpacing: 10,
           children: [
             const Pill('Full day · ~9 hours', icon: Icons.event_note),
-            Pill('~₱$_totalFare in jeep fares',
+            Pill('~₱${_totalFare(stops)} in jeep fares',
                 icon: Icons.payments,
                 bg: AppColors.priceBg,
                 fg: AppColors.priceInk),
@@ -40,11 +41,11 @@ class ItineraryTab extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 22),
-        for (int i = 0; i < heritageDayPlan.length; i++)
+        for (int i = 0; i < stops.length; i++)
           _TimelineRow(
             index: i + 1,
-            stop: heritageDayPlan[i],
-            isLast: i == heritageDayPlan.length - 1,
+            stop: stops[i],
+            isLast: i == stops.length - 1,
           ),
       ],
     );

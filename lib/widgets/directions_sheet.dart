@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../theme.dart';
 
 /// Opens the "Get directions" placeholder for a place.
@@ -27,7 +27,7 @@ class _DirectionsSheet extends StatelessWidget {
   final Place place;
   const _DirectionsSheet({required this.place});
 
-  CommuteRoute? get _matchingRoute {
+  CommuteRoute? _matchingRoute(List<CommuteRoute> routes) {
     for (final r in routes) {
       if (r.to.toLowerCase().contains(place.name.split(' ').first.toLowerCase())) {
         return r;
@@ -49,7 +49,7 @@ class _DirectionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    final route = _matchingRoute;
+    final route = _matchingRoute(ContentScope.of(context).routes);
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.82,

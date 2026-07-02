@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'theme.dart';
+import 'config/env.dart';
+import 'data/content_repository.dart';
+import 'data/content_scope.dart';
 import 'screens/home_tab.dart';
 import 'screens/places_tab.dart';
 import 'screens/food_tab.dart';
@@ -7,18 +10,29 @@ import 'screens/commute_tab.dart';
 import 'screens/itinerary_tab.dart';
 import 'screens/community_tab.dart';
 
-void main() => runApp(const SuroyIloiloApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Best-effort: load secrets and connect Supabase. If either is missing the
+  // app still runs fully on bundled seed data.
+  await Env.load();
+  await ContentRepository.init();
+  runApp(const SuroyIloiloApp());
+}
 
 class SuroyIloiloApp extends StatelessWidget {
   const SuroyIloiloApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SuroyIloilo',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.build(),
-      home: const AppShell(),
+    // ContentScope wraps MaterialApp so app content is reachable everywhere,
+    // including modal routes and bottom sheets that live above `home`.
+    return ContentScope(
+      child: MaterialApp(
+        title: 'SuroyIloilo',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.build(),
+        home: const AppShell(),
+      ),
     );
   }
 }

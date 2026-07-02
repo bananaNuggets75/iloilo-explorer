@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../main.dart';
 import '../theme.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../models.dart';
 import '../widgets/directions_sheet.dart';
 
@@ -12,6 +12,7 @@ class HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
     final nav = TabNav.of(context);
+    final content = ContentScope.of(context);
     return ListView(
       padding: EdgeInsets.zero,
       children: [
@@ -39,13 +40,13 @@ class HomeTab extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 8),
-              for (final p in places.take(3)) ...[
+              for (final p in content.places.take(3)) ...[
                 _FeaturedSpot(place: p),
                 const SizedBox(height: 12),
               ],
 
               const SizedBox(height: 16),
-              _statsRow(t),
+              _statsRow(t, content),
               const SizedBox(height: 24),
 
               _CtaBanner(onView: () => nav.goTo(4)),
@@ -59,7 +60,7 @@ class HomeTab extends StatelessWidget {
     );
   }
 
-  Widget _statsRow(TextTheme t) {
+  Widget _statsRow(TextTheme t, AppContent content) {
     Widget stat(String n, String l) => Expanded(
           child: SoftCard(
             padding: const EdgeInsets.symmetric(vertical: 22),
@@ -78,11 +79,11 @@ class HomeTab extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          stat('${places.length}', 'Curated spots'),
+          stat('${content.places.length}', 'Curated spots'),
           const SizedBox(width: 12),
-          stat('${foods.length}', 'Local food picks'),
+          stat('${content.foods.length}', 'Local food picks'),
           const SizedBox(width: 12),
-          stat('${routes.length}', 'Ride routes with fares'),
+          stat('${content.routes.length}', 'Ride routes with fares'),
         ],
       ),
     );

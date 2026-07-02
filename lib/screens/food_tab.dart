@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-import '../data/seed_data.dart';
+import '../data/content_scope.dart';
 import '../models.dart';
 
 class FoodTab extends StatelessWidget {
@@ -8,6 +8,7 @@ class FoodTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final foods = ContentScope.of(context).foods;
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 32),
       children: [

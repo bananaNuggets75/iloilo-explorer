@@ -18,3 +18,11 @@ pubspec.lock
 .flutter-plugins
 .flutter-plugins-dependencies
 .metadata
+
+# Generated native platform folders (regenerate with `flutter create .`)
+android/
+ios/
+linux/
+macos/
+web/
+windows/

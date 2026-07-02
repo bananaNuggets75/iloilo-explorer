@@ -38,8 +38,10 @@ class TabNav extends InheritedWidget {
 
 class _NavItem {
   final String label;
+  final IconData icon;
+  final IconData activeIcon;
   final Widget page;
-  const _NavItem(this.label, this.page);
+  const _NavItem(this.label, this.icon, this.activeIcon, this.page);
 }
 
 class AppShell extends StatefulWidget {
@@ -53,12 +55,13 @@ class _AppShellState extends State<AppShell> {
   int _index = 0;
 
   late final List<_NavItem> _items = const [
-    _NavItem('Home', HomeTab()),
-    _NavItem('Places', PlacesTab()),
-    _NavItem('Food', FoodTab()),
-    _NavItem('Commute & Fares', CommuteTab()),
-    _NavItem('Itinerary', ItineraryTab()),
-    _NavItem('Community', CommunityTab()),
+    _NavItem('Home', Icons.home_outlined, Icons.home, HomeTab()),
+    _NavItem('Places', Icons.place_outlined, Icons.place, PlacesTab()),
+    _NavItem('Food', Icons.restaurant_outlined, Icons.restaurant, FoodTab()),
+    _NavItem('Rides', Icons.directions_bus_outlined, Icons.directions_bus,
+        CommuteTab()),
+    _NavItem('Plan', Icons.map_outlined, Icons.map, ItineraryTab()),
+    _NavItem('Community', Icons.groups_outlined, Icons.groups, CommunityTab()),
   ];
 
   void _goTo(int i) => setState(() => _index = i);
@@ -78,16 +81,17 @@ class _AppShellState extends State<AppShell> {
               child: SafeArea(
                 child: Column(
                   children: [
-                    _TopBar(
-                      items: _items,
-                      index: _index,
-                      onSelect: _goTo,
-                    ),
+                    const _BrandHeader(),
                     Expanded(
                       child: IndexedStack(
                         index: _index,
                         children: [for (final item in _items) item.page],
                       ),
+                    ),
+                    _BottomNav(
+                      items: _items,
+                      index: _index,
+                      onSelect: _goTo,
                     ),
                   ],
                 ),
@@ -100,12 +104,9 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  final List<_NavItem> items;
-  final int index;
-  final ValueChanged<int> onSelect;
-  const _TopBar(
-      {required this.items, required this.index, required this.onSelect});
+/// Slim branded header shown above the content on every tab.
+class _BrandHeader extends StatelessWidget {
+  const _BrandHeader();
 
   @override
   Widget build(BuildContext context) {
@@ -114,51 +115,66 @@ class _TopBar extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.line)),
       ),
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.fromLTRB(18, 14, 18, 12),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: BrandMark(),
-            ),
-          ),
-          SizedBox(
-            height: 46,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              itemCount: items.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 4),
-              itemBuilder: (context, i) {
-                final selected = i == index;
-                return Center(
-                  child: GestureDetector(
-                    onTap: () => onSelect(i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 150),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 9),
-                      decoration: BoxDecoration(
-                        color: selected ? AppColors.chip : Colors.transparent,
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        items[i].label,
-                        style: TextStyle(
-                          fontWeight:
-                              selected ? FontWeight.w700 : FontWeight.w500,
-                          color: selected ? AppColors.ink : AppColors.muted,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+      child: const Padding(
+        padding: EdgeInsets.fromLTRB(18, 12, 18, 12),
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: BrandMark(),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bottom navigation bar — the primary way to move between sections on mobile.
+class _BottomNav extends StatelessWidget {
+  final List<_NavItem> items;
+  final int index;
+  final ValueChanged<int> onSelect;
+  const _BottomNav(
+      {required this.items, required this.index, required this.onSelect});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(top: BorderSide(color: AppColors.line)),
+      ),
+      child: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          backgroundColor: AppColors.surface,
+          indicatorColor: AppColors.chip,
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            final selected = states.contains(WidgetState.selected);
+            return TextStyle(
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              color: selected ? AppColors.ink : AppColors.muted,
+            );
+          }),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            final selected = states.contains(WidgetState.selected);
+            return IconThemeData(
+              size: 24,
+              color: selected ? AppColors.rust : AppColors.muted,
+            );
+          }),
+        ),
+        child: NavigationBar(
+          selectedIndex: index,
+          onDestinationSelected: onSelect,
+          height: 66,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+          destinations: [
+            for (final item in items)
+              NavigationDestination(
+                icon: Icon(item.icon),
+                selectedIcon: Icon(item.activeIcon),
+                label: item.label,
+              ),
+          ],
+        ),
       ),
     );
   }

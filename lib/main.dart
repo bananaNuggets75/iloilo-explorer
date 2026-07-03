@@ -9,6 +9,7 @@ import 'screens/food_tab.dart';
 import 'screens/commute_tab.dart';
 import 'screens/itinerary_tab.dart';
 import 'screens/community_tab.dart';
+import 'screens/passport_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -129,11 +130,21 @@ class _BrandHeader extends StatelessWidget {
         color: AppColors.surface,
         border: Border(bottom: BorderSide(color: AppColors.line)),
       ),
-      child: const Padding(
-        padding: EdgeInsets.fromLTRB(18, 12, 18, 12),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: BrandMark(),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 12, 12, 12),
+        child: Row(
+          children: [
+            const Expanded(child: BrandMark()),
+            // Suroy Passport — stamps, badges and jeep savings.
+            IconButton(
+              tooltip: 'Suroy Passport',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const PassportScreen()),
+              ),
+              icon: const Icon(Icons.workspace_premium,
+                  color: AppColors.rust, size: 26),
+            ),
+          ],
         ),
       ),
     );

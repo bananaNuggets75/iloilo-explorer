@@ -19,6 +19,8 @@ const List<Place> places = [
     tip: 'Pair with the gothic Molo Church right beside it and grab pancit '
         'molo nearby.',
     mapQuery: 'Molo Mansion, Iloilo City',
+    lat: 10.6957,
+    lng: 122.548,
   ),
   Place(
     id: 'jaro-cathedral',
@@ -34,6 +36,8 @@ const List<Place> places = [
     tip: 'The belfry sits across the street — a setup you rarely see in the '
         'Philippines.',
     mapQuery: 'Jaro Cathedral, Iloilo City',
+    lat: 10.7203,
+    lng: 122.5577,
   ),
   Place(
     id: 'esplanade',
@@ -48,6 +52,8 @@ const List<Place> places = [
     bestTime: 'Sunset (5–6 PM)',
     tip: 'SM City sits on Esplanade 1 — start there and walk the boardwalk.',
     mapQuery: 'Iloilo River Esplanade',
+    lat: 10.7089,
+    lng: 122.5494,
   ),
   Place(
     id: 'camina',
@@ -62,6 +68,8 @@ const List<Place> places = [
     bestTime: 'Afternoon tours (reserve ahead)',
     tip: 'Call before going — it is a working heritage home, not a mall.',
     mapQuery: 'Camina Balay nga Bato, Arevalo, Iloilo City',
+    lat: 10.6942,
+    lng: 122.5106,
   ),
   Place(
     id: 'museo-iloilo',
@@ -76,6 +84,8 @@ const List<Place> places = [
     bestTime: 'Late morning',
     tip: 'Combine with a Calle Real heritage walk right next door.',
     mapQuery: 'Museo Iloilo',
+    lat: 10.7,
+    lng: 122.5652,
   ),
   Place(
     id: 'calle-real',
@@ -90,6 +100,8 @@ const List<Place> places = [
     bestTime: 'Morning or golden hour',
     tip: 'Look up — the best-preserved facades are on the upper floors.',
     mapQuery: 'Calle Real, Iloilo City',
+    lat: 10.6958,
+    lng: 122.5679,
   ),
   Place(
     id: 'gigantes',
@@ -104,6 +116,8 @@ const List<Place> places = [
     bestTime: 'Very early start (leave by 4–5 AM)',
     tip: 'Best as an overnight; day-tripping from the city is a long haul.',
     mapQuery: 'Islas de Gigantes, Carles, Iloilo',
+    lat: 11.596,
+    lng: 123.342,
   ),
   Place(
     id: 'garin-farm',
@@ -118,6 +132,8 @@ const List<Place> places = [
     bestTime: 'Morning (climb before the heat)',
     tip: 'Wear light clothes — the stairway to the top is a real workout.',
     mapQuery: 'Garin Farm, San Joaquin, Iloilo',
+    lat: 10.59,
+    lng: 122.142,
   ),
 ];
 

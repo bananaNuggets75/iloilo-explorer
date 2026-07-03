@@ -65,8 +65,13 @@ class Place {
   final String tip;
 
   /// Google Maps destination query (place name / address). Used to build a
-  /// keyless maps URL for the "Get directions" placeholder.
+  /// keyless maps URL for the "Get directions" hand-off.
   final String mapQuery;
+
+  /// Approximate coordinates for the in-app map and passport check-ins.
+  /// 0 means "unknown" and hides the map for that place.
+  final double lat;
+  final double lng;
 
   const Place({
     required this.id,
@@ -79,7 +84,11 @@ class Place {
     required this.bestTime,
     required this.tip,
     required this.mapQuery,
+    this.lat = 0,
+    this.lng = 0,
   });
+
+  bool get hasCoordinates => lat != 0 && lng != 0;
 
   factory Place.fromJson(Map<String, dynamic> j) => Place(
         id: _str(j['id']),
@@ -92,6 +101,8 @@ class Place {
         bestTime: _str(j['best_time']),
         tip: _str(j['tip']),
         mapQuery: _str(j['map_query']),
+        lat: _dbl(j['lat']),
+        lng: _dbl(j['lng']),
       );
 }
 

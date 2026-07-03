@@ -27,6 +27,14 @@ Security), so the publishable key can read content but not modify it.
 Run `seed.sql` the same way. It mirrors the app's bundled data so live content
 matches what you already see. (Safe to re-run — it truncates first.)
 
+## 3b. Community sharing (optional)
+
+Run `community.sql` to enable anonymous traveler posts: it creates the
+`community_posts` table (public read + insert with length limits, hearts only
+through a `mark_helpful` RPC) and a public `community-images` storage bucket
+(5 MB cap, images only). No auth needed — each install gets an anonymous
+device id. Moderate by deleting rows in the Table editor.
+
 ## 4. Manage content (your admin)
 
 Use the Supabase **Table editor** as your admin panel: edit `places`, `foods`,

@@ -17,6 +17,9 @@ pubspec.lock
 *.env
 !.env.example
 
+# Generated reports
+*.pdf
+
 # OS
 .DS_Store
 

@@ -21,6 +21,8 @@ create table if not exists places (
   best_time   text,
   tip         text,
   map_query   text,
+  lat         double precision default 0, -- approximate pin for the map
+  lng         double precision default 0,
   sort        integer default 0
 );
 

@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../models.dart';
 import '../data/content_scope.dart';
 import '../theme.dart';
+import 'route_map.dart';
 
 /// Opens the "Get directions" placeholder for a place.
 ///
@@ -75,8 +76,12 @@ class _DirectionsSheet extends StatelessWidget {
           Text(place.name, style: t.headlineSmall?.copyWith(fontSize: 24)),
           const SizedBox(height: 18),
 
-          // Map placeholder (live Google Maps goes here once credentials exist).
-          _MapPlaceholder(area: place.area),
+          // Live map: OSM tiles + GPS + road route (free, keyless). Falls
+          // back to a destination-only pin when location is unavailable.
+          if (place.hasCoordinates)
+            RouteMap(place: place)
+          else
+            _MapPlaceholder(area: place.area),
           const SizedBox(height: 18),
 
           // From -> To
@@ -173,7 +178,11 @@ class _DirectionsSheet extends StatelessWidget {
           const SizedBox(height: 10),
           Center(
             child: Text(
-              'Live in-app navigation is a placeholder pending Maps credentials.',
+              place.hasCoordinates
+                  ? 'Map by OpenStreetMap · road distance and time are '
+                      'approximate.'
+                  : 'Map preview unavailable for this place — use the Google '
+                      'Maps hand-off above.',
               style: t.bodySmall,
               textAlign: TextAlign.center,
             ),

@@ -61,6 +61,18 @@ flutter run -d chrome        # quickest way to test
 For the Android emulator: `flutter emulators --launch <id>` then
 `flutter run`. Run `flutter doctor` if a platform is missing.
 
+**Android location permission** (the platform folders are generated, so this
+must be re-added after `flutter create .`): in
+`android/app/src/main/AndroidManifest.xml`, inside `<manifest>` add
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+```
+
+On web/Chrome the browser asks for location permission by itself — nothing to
+configure.
+
 ## Editing content
 
 All pilot content lives in `lib/data/seed_data.dart` — places, food, routes,

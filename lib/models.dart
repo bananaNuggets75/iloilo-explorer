@@ -236,3 +236,37 @@ class ItineraryStop {
         fare: _str(j['fare']),
       );
 }
+
+/// An anonymous traveler experience shared from the app (no account needed).
+class CommunityPost {
+  final String id;
+  final String author;
+  final String from;
+  final String topic;
+  final String body;
+  final String imageUrl;
+  final int helpful;
+  final DateTime? createdAt;
+
+  const CommunityPost({
+    required this.id,
+    required this.author,
+    required this.from,
+    required this.topic,
+    required this.body,
+    required this.imageUrl,
+    required this.helpful,
+    this.createdAt,
+  });
+
+  factory CommunityPost.fromJson(Map<String, dynamic> j) => CommunityPost(
+        id: _str(j['id']),
+        author: _str(j['author']),
+        from: _str(j['from_label']),
+        topic: _str(j['topic']),
+        body: _str(j['body']),
+        imageUrl: _str(j['image_url']),
+        helpful: _int(j['helpful']),
+        createdAt: DateTime.tryParse(_str(j['created_at']))?.toLocal(),
+      );
+}

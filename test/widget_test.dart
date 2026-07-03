@@ -1,6 +1,7 @@
 // Smoke tests for SuroyIloilo.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:iloilo_travel_buddy/main.dart';
 
@@ -24,5 +25,19 @@ void main() {
 
     expect(find.text('Places & hidden gems'), findsOneWidget);
     expect(find.text('Molo Mansion'), findsWidgets);
+  });
+
+  testWidgets('Header passport button opens the Suroy Passport',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(const SuroyIloiloApp());
+    await tester.pump();
+
+    await tester.tap(find.byTooltip('Suroy Passport'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Suroy Passport'), findsOneWidget);
+    expect(find.text('Stamps'), findsWidgets);
+    expect(find.textContaining('GPS-verified'), findsOneWidget);
   });
 }

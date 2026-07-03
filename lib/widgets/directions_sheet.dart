@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models.dart';
 import '../data/content_scope.dart';
+import '../data/passport_repository.dart';
 import '../theme.dart';
 import 'route_map.dart';
 
@@ -82,7 +83,13 @@ class _DirectionsSheet extends StatelessWidget {
             RouteMap(place: place)
           else
             _MapPlaceholder(area: place.area),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
+
+          // Suroy Passport check-in — only stamps when physically nearby.
+          if (place.hasCoordinates) ...[
+            _CheckInButton(place: place),
+            const SizedBox(height: 12),
+          ],
 
           // From -> To
           SoftCard(
@@ -255,6 +262,83 @@ class _MapPlaceholder extends StatelessWidget {
               style: TextStyle(color: AppColors.muted, fontSize: 12)),
         ],
       ),
+    );
+  }
+}
+
+/// "Check in" for the Suroy Passport — stamps only when the user is
+/// physically within the check-in radius of the place.
+class _CheckInButton extends StatefulWidget {
+  final Place place;
+  const _CheckInButton({required this.place});
+
+  @override
+  State<_CheckInButton> createState() => _CheckInButtonState();
+}
+
+class _CheckInButtonState extends State<_CheckInButton> {
+  final _repo = PassportRepository();
+  bool _stamped = false;
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _repo.isCheckedIn(widget.place.id).then((v) {
+      if (mounted && v) setState(() => _stamped = true);
+    });
+  }
+
+  Future<void> _checkIn() async {
+    setState(() => _busy = true);
+    final result = await _repo.tryCheckIn(widget.place);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _stamped = result.status == CheckInStatus.stamped ||
+          result.status == CheckInStatus.alreadyStamped;
+    });
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(result.message)));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_stamped) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 13),
+        decoration: BoxDecoration(
+          color: AppColors.priceBg,
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.verified, size: 19, color: AppColors.priceInk),
+            SizedBox(width: 8),
+            Text('In your Suroy Passport',
+                style: TextStyle(
+                    color: AppColors.priceInk, fontWeight: FontWeight.w700)),
+          ],
+        ),
+      );
+    }
+    return OutlinedButton.icon(
+      onPressed: _busy ? null : _checkIn,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: AppColors.rust,
+        side: const BorderSide(color: AppColors.rust),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      ),
+      icon: _busy
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2))
+          : const Icon(Icons.approval, size: 19),
+      label: Text(_busy ? 'Checking your location…' : 'Check in — stamp this place'),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../data/content_scope.dart';
+import '../data/passport_repository.dart';
 import '../models.dart';
 
 class CommuteTab extends StatelessWidget {
@@ -137,8 +138,30 @@ class _RouteCard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 8),
+          // Passport fare-saved counter: log a ride, bank the savings.
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => _logRide(context),
+              style: TextButton.styleFrom(foregroundColor: AppColors.rust),
+              icon: const Icon(Icons.savings_outlined, size: 18),
+              label: const Text('I rode this — log my savings'),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _logRide(BuildContext context) async {
+    final (saved, total) = await PassportRepository().logRide(route.fare);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(saved > 0
+          ? 'Nice ride! ₱$saved saved vs a taxi — ₱$total banked in your '
+              'Suroy Passport.'
+          : 'Ride logged in your Suroy Passport.'),
+    ));
   }
 }

@@ -5,6 +5,7 @@ import '../data/content_scope.dart';
 import '../data/passport_repository.dart';
 import '../theme.dart';
 import 'route_map.dart';
+import 'share_helper.dart';
 
 /// Opens the "Get directions" placeholder for a place.
 ///
@@ -298,8 +299,20 @@ class _CheckInButtonState extends State<_CheckInButton> {
       _stamped = result.status == CheckInStatus.stamped ||
           result.status == CheckInStatus.alreadyStamped;
     });
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(result.message)));
+    final freshStamp = result.status == CheckInStatus.stamped;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(result.message),
+      action: freshStamp
+          ? SnackBarAction(
+              label: 'Share',
+              onPressed: () => shareText(
+                context,
+                'Stamped ${widget.place.name} in my Suroy Passport — '
+                'exploring Iloilo like a local with SuroyIloilo.',
+              ),
+            )
+          : null,
+    ));
   }
 
   @override

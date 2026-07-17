@@ -36,7 +36,7 @@ void main() {
     await tester.pump();
 
     expect(find.textContaining('RIDE LIKE'), findsOneWidget);
-    expect(find.text('DAYON!'), findsOneWidget);
+    expect(find.text('SUROY ILOILO'), findsOneWidget);
 
     await tester.tap(find.text('Plan my day'));
     await tester.pumpAndSettle();

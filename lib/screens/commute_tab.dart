@@ -87,12 +87,13 @@ class _RouteCard extends StatelessWidget {
           const SizedBox(height: 4),
           Text(route.to, style: t.titleMedium),
           const SizedBox(height: 12),
+          // The jeepney signboard plate — look for this exact sign on the jeep.
           Wrap(
             spacing: 8,
             runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Pill(route.mode,
-                  icon: route.modeIcon, bg: AppColors.chip, fg: AppColors.rust),
+              JeepneyPlate(signboardOf(route.mode)),
               Pill(route.fare,
                   icon: Icons.payments,
                   bg: AppColors.priceBg,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -30,6 +31,7 @@ class _RouteMapState extends State<RouteMap> {
   double? _km;
   double? _mins;
   String _status = 'Locating you…';
+  LocationFailure _failure = LocationFailure.none;
 
   LatLng get _dest => LatLng(widget.place.lat, widget.place.lng);
 
@@ -40,21 +42,25 @@ class _RouteMapState extends State<RouteMap> {
   }
 
   Future<void> _locateAndRoute() async {
-    final pos = await _currentPosition();
+    setState(() {
+      _status = 'Locating you…';
+      _failure = LocationFailure.none;
+    });
+    final result = await fastPosition(accuracy: LocationAccuracy.medium);
     if (!mounted) return;
-    if (pos == null) {
-      setState(() => _status = 'Location off — showing the destination');
+    if (!result.ok) {
+      setState(() {
+        _failure = result.failure;
+        _status = result.hint;
+      });
       return;
     }
     setState(() {
-      _user = LatLng(pos.latitude, pos.longitude);
+      _user = LatLng(result.position!.latitude, result.position!.longitude);
       _status = 'Drawing the route…';
     });
     await _fetchRoute();
   }
-
-  Future<Position?> _currentPosition() =>
-      fastPosition(accuracy: LocationAccuracy.medium);
 
   Future<void> _fetchRoute() async {
     final u = _user;
@@ -157,28 +163,70 @@ class _RouteMapState extends State<RouteMap> {
             Positioned(
               top: 10,
               left: 10,
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.95),
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: AppColors.line),
-                ),
-                child: Text(
-                  _status.isNotEmpty
-                      ? _status
-                      : '${_km!.toStringAsFixed(_km! < 10 ? 1 : 0)} km · '
-                          '~${_mins!.round()} min by road',
-                  style: const TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.ink,
+              right: 10,
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface.withValues(alpha: 0.95),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppColors.line),
+                  ),
+                  child: Text(
+                    _status.isNotEmpty
+                        ? _status
+                        : '${_km!.toStringAsFixed(_km! < 10 ? 1 : 0)} km · '
+                            '~${_mins!.round()} min by road',
+                    style: const TextStyle(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
+                    ),
                   ),
                 ),
               ),
             ),
+            // Fix-it actions when the lookup failed
+            if (_failure != LocationFailure.none)
+              Positioned(
+                bottom: 10,
+                left: 10,
+                child: Row(children: [
+                  _actionChip('Retry', Icons.refresh, _locateAndRoute),
+                  if (!kIsWeb) ...[
+                    const SizedBox(width: 8),
+                    _actionChip('Settings', Icons.settings, () async {
+                      await openLocationFix(_failure);
+                    }),
+                  ],
+                ]),
+              ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _actionChip(String label, IconData icon, VoidCallback onTap) {
+    return Material(
+      color: AppColors.rust,
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Icon(icon, size: 15, color: Colors.white),
+            const SizedBox(width: 6),
+            Text(label,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12.5)),
+          ]),
         ),
       ),
     );

@@ -12,13 +12,15 @@ class LandingScreen extends StatelessWidget {
 
   static const seenKey = 'suroy_seen_landing';
 
-  Future<void> _enter(BuildContext context, int tabIndex) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(seenKey, true);
-    if (!context.mounted) return;
+  void _enter(BuildContext context, int tabIndex) {
+    // Navigate immediately — never let storage quirks block the tap.
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => AppShell(initialIndex: tabIndex)),
     );
+    // Remember the visit in the background (best effort).
+    SharedPreferences.getInstance()
+        .then((p) => p.setBool(seenKey, true))
+        .catchError((_) => true);
   }
 
   @override
@@ -51,12 +53,10 @@ class LandingScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(children: [
-                            const JeepneyPlate('Dayon!'),
-                            const SizedBox(width: 10),
-                            Text('"come in · welcome"',
-                                style: body.copyWith(fontSize: 12)),
-                          ]),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: JeepneyPlate('Suroy Iloilo'),
+                          ),
                           const Spacer(),
                           Text('RIDE LIKE\nA LOCAL.\nSEE IT ALL.',
                               style: display),

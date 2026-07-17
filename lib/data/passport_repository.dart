@@ -24,7 +24,9 @@ enum CheckInStatus { stamped, alreadyStamped, tooFar, noLocation, noCoords }
 class CheckInResult {
   final CheckInStatus status;
   final double distanceMeters;
-  const CheckInResult(this.status, [this.distanceMeters = 0]);
+  final LocationFailure failure;
+  const CheckInResult(this.status,
+      [this.distanceMeters = 0, this.failure = LocationFailure.none]);
 
   String get message => switch (status) {
         CheckInStatus.stamped => 'Stamped! Added to your Suroy Passport.',
@@ -34,8 +36,7 @@ class CheckInResult {
                 'get closer to stamp this place.'
             : "You're ${distanceMeters.round()} m away — get closer to stamp "
                 'this place.',
-        CheckInStatus.noLocation =>
-          'Location is off — enable it to stamp places.',
+        CheckInStatus.noLocation => LocationResult(null, failure).hint,
         CheckInStatus.noCoords => 'This place has no map pin yet.',
       };
 }
@@ -88,8 +89,16 @@ class PassportRepository {
       return const CheckInResult(CheckInStatus.alreadyStamped);
     }
 
-    final pos = await _currentPosition();
-    if (pos == null) return const CheckInResult(CheckInStatus.noLocation);
+    // Check-ins tolerate a slightly stale fix (people move at walking speed
+    // and the radius is generous), so a 1-minute cache keeps stamping snappy.
+    final result = await fastPosition(
+      accuracy: LocationAccuracy.high,
+      maxAge: const Duration(minutes: 1),
+    );
+    if (!result.ok) {
+      return CheckInResult(CheckInStatus.noLocation, 0, result.failure);
+    }
+    final pos = result.position!;
 
     final distance = Geolocator.distanceBetween(
         pos.latitude, pos.longitude, place.lat, place.lng);
@@ -106,13 +115,6 @@ class PassportRepository {
     );
     return CheckInResult(CheckInStatus.stamped, distance);
   }
-
-  // Check-ins tolerate a slightly stale fix (people move at walking speed
-  // and the radius is generous), so a 1-minute cache keeps stamping snappy.
-  Future<Position?> _currentPosition() => fastPosition(
-        accuracy: LocationAccuracy.high,
-        maxAge: const Duration(minutes: 1),
-      );
 
   /// Log a jeepney ride from a route card; returns (pesos saved this ride,
   /// cumulative saved).

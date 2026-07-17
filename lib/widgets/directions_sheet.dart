@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import '../models.dart';
 import '../data/content_scope.dart';
+import '../data/location_helper.dart';
 import '../data/passport_repository.dart';
 import '../theme.dart';
 import 'route_map.dart';
@@ -300,8 +303,11 @@ class _CheckInButtonState extends State<_CheckInButton> {
           result.status == CheckInStatus.alreadyStamped;
     });
     final freshStamp = result.status == CheckInStatus.stamped;
+    final locationBlocked =
+        result.status == CheckInStatus.noLocation && !kIsWeb;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(result.message),
+      duration: const Duration(seconds: 5),
       action: freshStamp
           ? SnackBarAction(
               label: 'Share',
@@ -311,7 +317,12 @@ class _CheckInButtonState extends State<_CheckInButton> {
                 'exploring Iloilo like a local with SuroyIloilo.',
               ),
             )
-          : null,
+          : locationBlocked
+              ? SnackBarAction(
+                  label: 'Settings',
+                  onPressed: () => openLocationFix(result.failure),
+                )
+              : null,
     ));
   }
 

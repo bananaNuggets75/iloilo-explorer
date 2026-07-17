@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'theme.dart';
 import 'config/env.dart';
 import 'data/content_repository.dart';
@@ -9,6 +10,7 @@ import 'screens/food_tab.dart';
 import 'screens/commute_tab.dart';
 import 'screens/itinerary_tab.dart';
 import 'screens/community_tab.dart';
+import 'screens/landing_screen.dart';
 import 'screens/passport_screen.dart';
 
 Future<void> main() async {
@@ -17,11 +19,19 @@ Future<void> main() async {
   // app still runs fully on bundled seed data.
   await Env.load();
   await ContentRepository.init();
-  runApp(const SuroyIloiloApp());
+  // The Dayon welcome screen shows on first launch only.
+  bool seenLanding = false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    seenLanding = prefs.getBool(LandingScreen.seenKey) ?? false;
+  } catch (_) {/* fall through to showing the landing */}
+  runApp(SuroyIloiloApp(showLanding: !seenLanding));
 }
 
 class SuroyIloiloApp extends StatelessWidget {
-  const SuroyIloiloApp({super.key});
+  /// Whether to open on the Dayon landing screen (first launch).
+  final bool showLanding;
+  const SuroyIloiloApp({super.key, this.showLanding = false});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +42,7 @@ class SuroyIloiloApp extends StatelessWidget {
         title: 'SuroyIloilo',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.build(),
-        home: const AppShell(),
+        home: showLanding ? const LandingScreen() : const AppShell(),
       ),
     );
   }
@@ -60,14 +70,15 @@ class _NavItem {
 }
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  final int initialIndex;
+  const AppShell({super.key, this.initialIndex = 0});
 
   @override
   State<AppShell> createState() => _AppShellState();
 }
 
 class _AppShellState extends State<AppShell> {
-  int _index = 0;
+  late int _index = widget.initialIndex;
 
   late final List<_NavItem> _items = const [
     _NavItem('Home', Icons.home_outlined, Icons.home, HomeTab()),

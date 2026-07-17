@@ -129,6 +129,50 @@ class Pill extends StatelessWidget {
   }
 }
 
+/// Dayon UI-kit tokens (from the v0.1 design kit) — used by the landing
+/// screen and the jeepney signboard plates.
+class DayonColors {
+  static const ink = Color(0xFF1A2B2E);
+  static const teal = Color(0xFF0D8E5F);
+  static const signboard = Color(0xFFF6BE3F);
+  static const red = Color(0xFFC93A25);
+  static const paper = Color(0xFFFBFAF6);
+  static const water = Color(0xFFBFD9DB);
+}
+
+/// Extracts the signboard text from a route mode label, e.g.
+/// "Jeepney · Molo / Villa jeep" -> "Molo / Villa jeep".
+String signboardOf(String mode) =>
+    mode.contains('·') ? mode.split('·').last.trim() : mode;
+
+/// The kit's signature element: a jeepney signboard plate. Used wherever a
+/// ride instruction names the jeep to look for.
+class JeepneyPlate extends StatelessWidget {
+  final String text;
+  final double fontSize;
+  const JeepneyPlate(this.text, {super.key, this.fontSize = 13});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: DayonColors.signboard,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: DayonColors.ink, width: 1.5),
+      ),
+      child: Text(
+        text.toUpperCase(),
+        style: GoogleFonts.anton(
+          fontSize: fontSize,
+          color: DayonColors.ink,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
 /// Section eyebrow + title used at the top of each tab.
 class SectionIntro extends StatelessWidget {
   final String eyebrow;

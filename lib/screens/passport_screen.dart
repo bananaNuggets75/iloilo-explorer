@@ -4,6 +4,7 @@ import '../data/content_scope.dart';
 import '../data/passport_repository.dart';
 import '../models.dart';
 import '../theme.dart';
+import '../widgets/share_helper.dart';
 
 /// The Suroy Passport — the user's collected stamps, badges and jeep savings.
 class PassportScreen extends StatefulWidget {
@@ -58,8 +59,15 @@ class _PassportScreenState extends State<PassportScreen> {
                     icon: const Icon(Icons.arrow_back, color: AppColors.ink),
                   ),
                   const SizedBox(width: 4),
-                  Text('Suroy Passport',
-                      style: t.headlineSmall?.copyWith(fontSize: 24)),
+                  Expanded(
+                    child: Text('Suroy Passport',
+                        style: t.headlineSmall?.copyWith(fontSize: 24)),
+                  ),
+                  IconButton(
+                    tooltip: 'Share my passport',
+                    onPressed: () => _share(places, badges),
+                    icon: const Icon(Icons.ios_share, color: AppColors.rust),
+                  ),
                 ]),
                 const SizedBox(height: 8),
                 Text(
@@ -115,6 +123,23 @@ class _PassportScreenState extends State<PassportScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _share(List<Place> places, List<PassportBadge> badges) async {
+    final earned = badges.where((b) => b.earned).map((b) => b.name).toList();
+    final stampedNames = places
+        .where((p) => _stamps.containsKey(p.id))
+        .map((p) => p.name)
+        .toList();
+    final lines = [
+      'My Suroy Passport — Iloilo',
+      '${_stamps.length}/${places.length} places stamped'
+          '${earned.isEmpty ? '' : ' · badges: ${earned.join(', ')}'}',
+      if (stampedNames.isNotEmpty) 'Been to: ${stampedNames.join(', ')}',
+      if (_saved > 0) 'Saved P$_saved riding jeepneys instead of taxis',
+      'Explore Iloilo like a local with SuroyIloilo.',
+    ];
+    await shareText(context, lines.join('\n'));
   }
 
   Widget _stat(TextTheme t, String n, String label) => Expanded(

@@ -29,6 +29,21 @@ void main() {
     expect(find.text('Molo Mansion'), findsWidgets);
   });
 
+  testWidgets('Landing screen routes into the trip planner',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(const SuroyIloiloApp(showLanding: true));
+    await tester.pump();
+
+    expect(find.textContaining('RIDE LIKE'), findsOneWidget);
+    expect(find.text('DAYON!'), findsOneWidget);
+
+    await tester.tap(find.text('Plan my day'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Build your own'), findsOneWidget);
+  });
+
   testWidgets('Trip planner builds a custom day plan',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});

@@ -1,9 +1,11 @@
 // Smoke tests for SuroyIloilo.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:iloilo_travel_buddy/main.dart';
+import 'package:iloilo_travel_buddy/screens/itinerary_tab.dart';
 
 void main() {
   testWidgets('App boots on the Home tab with the brand and hero',
@@ -25,6 +27,38 @@ void main() {
 
     expect(find.text('Places & hidden gems'), findsOneWidget);
     expect(find.text('Molo Mansion'), findsWidgets);
+  });
+
+  testWidgets('Trip planner builds a custom day plan',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(const SuroyIloiloApp());
+    await tester.pump();
+
+    await tester.tap(find.text('Plan').first);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Build your own'));
+    await tester.pumpAndSettle();
+
+    final planScrollable = find
+        .descendant(
+            of: find.byType(ItineraryTab), matching: find.byType(Scrollable))
+        .first;
+
+    await tester.tap(find.text('Molo Mansion'));
+    await tester.pump();
+
+    await tester.scrollUntilVisible(find.text('Build my plan (1)'), 100,
+        scrollable: planScrollable);
+    await tester.tap(find.text('Build my plan (1)'));
+    await tester.pumpAndSettle();
+
+    await tester.scrollUntilVisible(find.text('Share plan'), 100,
+        scrollable: planScrollable);
+    expect(find.text('8:00 AM'), findsWidgets);
+    expect(find.text('Molo Mansion'), findsWidgets);
+    expect(find.textContaining('in fares'), findsOneWidget);
   });
 
   testWidgets('Header passport button opens the Suroy Passport',

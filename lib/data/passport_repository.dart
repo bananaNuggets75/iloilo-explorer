@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models.dart';
+import 'location_helper.dart';
 
 /// The Suroy Passport — GPS-verified check-in stamps, badges and a
 /// fare-saved counter. Entirely local and anonymous: shared_preferences on
@@ -106,27 +107,12 @@ class PassportRepository {
     return CheckInResult(CheckInStatus.stamped, distance);
   }
 
-  Future<Position?> _currentPosition() async {
-    try {
-      if (!await Geolocator.isLocationServiceEnabled()) return null;
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
-      return await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
-          timeLimit: Duration(seconds: 12),
-        ),
+  // Check-ins tolerate a slightly stale fix (people move at walking speed
+  // and the radius is generous), so a 1-minute cache keeps stamping snappy.
+  Future<Position?> _currentPosition() => fastPosition(
+        accuracy: LocationAccuracy.high,
+        maxAge: const Duration(minutes: 1),
       );
-    } catch (_) {
-      return null;
-    }
-  }
 
   /// Log a jeepney ride from a route card; returns (pesos saved this ride,
   /// cumulative saved).

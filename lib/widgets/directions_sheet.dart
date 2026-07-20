@@ -248,7 +248,7 @@ class _MapPlaceholder extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFEFE7D6), Color(0xFFE7DCC7)],
+          colors: [AppColors.chip, AppColors.line],
         ),
       ),
       child: Column(

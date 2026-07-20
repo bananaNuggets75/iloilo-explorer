@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../main.dart';
 import '../theme.dart';
 import '../data/content_scope.dart';
@@ -16,13 +17,15 @@ class HomeTab extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.zero,
       children: [
-        _Hero(onExplore: () => nav.goTo(1), onFares: () => nav.goTo(3)),
+        _Hero(onPlan: () => nav.goTo(4), onExplore: () => nav.goTo(1)),
         Padding(
-          padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+          padding: const EdgeInsets.fromLTRB(18, 20, 18, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _FeatureGrid(),
+              const _QuickActions(),
+              const SizedBox(height: 28),
+              _statsRow(t, content),
               const SizedBox(height: 28),
 
               Row(
@@ -39,16 +42,28 @@ class HomeTab extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              for (final p in content.places.take(3)) ...[
-                _FeaturedSpot(place: p),
-                const SizedBox(height: 12),
-              ],
-
-              const SizedBox(height: 16),
-              _statsRow(t, content),
-              const SizedBox(height: 24),
-
+              const SizedBox(height: 4),
+            ],
+          ),
+        ),
+        // Horizontally swipeable — a carousel reads as an app, a stacked
+        // column of blurbs reads as a blog.
+        SizedBox(
+          height: 190,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            scrollDirection: Axis.horizontal,
+            itemCount: content.places.take(6).length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, i) =>
+                _FeaturedSpot(place: content.places[i]),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 24, 18, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               _CtaBanner(onView: () => nav.goTo(4)),
               const SizedBox(height: 28),
               const _Footer(),
@@ -90,69 +105,53 @@ class HomeTab extends StatelessWidget {
   }
 }
 
+/// Dark-ink hero — continues the Dayon landing's visual language into the
+/// app itself instead of switching to a warm editorial gradient.
 class _Hero extends StatelessWidget {
+  final VoidCallback onPlan;
   final VoidCallback onExplore;
-  final VoidCallback onFares;
-  const _Hero({required this.onExplore, required this.onFares});
+  const _Hero({required this.onPlan, required this.onExplore});
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 32),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFFF6C98A), Color(0xFFF3D9C2), Color(0xFFFBF6EC)],
-        ),
-      ),
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 26),
+      color: DayonColors.ink,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Pill('PILOT CITY · ILOILO',
-              icon: Icons.explore, bg: AppColors.surface, fg: AppColors.rust),
-          const SizedBox(height: 18),
-          Text('Explore Iloilo like a local — spots, food, and how to get '
-              'there.',
-              style: t.displaySmall?.copyWith(fontSize: 40)),
-          const SizedBox(height: 16),
+          Row(children: [
+            const JeepneyPlate('Suroy Iloilo'),
+            const Spacer(),
+            IconButton(
+              onPressed: onExplore,
+              icon: const Icon(Icons.search, color: Colors.white),
+              tooltip: 'Explore places',
+            ),
+          ]),
+          const SizedBox(height: 14),
           Text(
-            'One companion for heritage sites, hidden eats, jeepney routes with '
-            'fares, day plans, and tips from travelers who\'ve been there.',
-            style: t.bodyLarge?.copyWith(color: AppColors.ink, fontSize: 16),
+            'Where in Iloilo\nare you headed?',
+            style: GoogleFonts.anton(
+                color: Colors.white, fontSize: 32, height: 1.05),
           ),
-          const SizedBox(height: 24),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              FilledButton(
-                onPressed: onExplore,
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.rust,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999)),
-                ),
-                child: const Text('Start exploring'),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: onPlan,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.signboard,
+                foregroundColor: DayonColors.ink,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14)),
               ),
-              OutlinedButton(
-                onPressed: onFares,
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.ink,
-                  backgroundColor: AppColors.surface,
-                  side: const BorderSide(color: AppColors.line),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(999)),
-                ),
-                child: const Text('Ride & fare guide'),
-              ),
-            ],
+              icon: const Icon(Icons.route),
+              label: Text('Plan my day',
+                  style: GoogleFonts.archivo(fontWeight: FontWeight.w700)),
+            ),
           ),
         ],
       ),
@@ -160,64 +159,60 @@ class _Hero extends StatelessWidget {
   }
 }
 
-class _Feature {
+class _Action {
   final IconData icon;
-  final String title;
-  final String body;
+  final String label;
   final int tab;
-  const _Feature(this.icon, this.title, this.body, this.tab);
+  const _Action(this.icon, this.label, this.tab);
 }
 
-class _FeatureGrid extends StatelessWidget {
-  const _FeatureGrid();
+/// A tappable strip of app shortcuts — dashboard-style navigation instead
+/// of paragraphs describing each section.
+class _QuickActions extends StatelessWidget {
+  const _QuickActions();
 
-  static const _features = [
-    _Feature(Icons.place, 'Places & hidden gems',
-        'Heritage sites, nature trips and local-only spots.', 1),
-    _Feature(Icons.ramen_dining, 'Local food',
-        'Batchoy, pancit molo, inasal — where locals actually eat.', 2),
-    _Feature(Icons.directions_bus, 'Commute & fares',
-        'Which jeep to ride, transfers, and honest fare estimates.', 3),
-    _Feature(Icons.map, 'Day itineraries',
-        'Ready-made plans with routes and fares built in.', 4),
-    _Feature(Icons.forum, 'Traveler tips',
-        'Real advice from travelers and Ilonggo locals.', 5),
-    _Feature(Icons.celebration, 'Events',
-        'Dinagyang, Paraw Regatta, food crawls and night markets.', 5),
+  static const _actions = [
+    _Action(Icons.place, 'Places', 1),
+    _Action(Icons.ramen_dining, 'Food', 2),
+    _Action(Icons.directions_bus, 'Rides', 3),
+    _Action(Icons.forum, 'Community', 5),
   ];
 
   @override
   Widget build(BuildContext context) {
-    final t = Theme.of(context).textTheme;
     final nav = TabNav.of(context);
-    return LayoutBuilder(builder: (context, c) {
-      const spacing = 12.0;
-      final cols = c.maxWidth > 680 ? 3 : (c.maxWidth > 440 ? 2 : 1);
-      final cardW = (c.maxWidth - spacing * (cols - 1)) / cols;
-      return Wrap(
-        spacing: spacing,
-        runSpacing: spacing,
-        children: [
-          for (final f in _features)
-            SizedBox(
-              width: cardW,
-              child: SoftCard(
-                onTap: () => nav.goTo(f.tab),
+    return Row(
+      children: [
+        for (final a in _actions) ...[
+          Expanded(
+            child: InkWell(
+              onTap: () => nav.goTo(a.tab),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.line),
+                ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _iconTile(f.icon),
-                    const SizedBox(height: 16),
-                    Text(f.title, style: t.titleMedium),
+                    Icon(a.icon, color: AppColors.rust, size: 22),
                     const SizedBox(height: 6),
-                    Text(f.body, style: t.bodyMedium),
+                    Text(a.label,
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.ink)),
                   ],
                 ),
               ),
             ),
+          ),
+          if (a != _actions.last) const SizedBox(width: 10),
         ],
-      );
-    });
+      ],
+    );
   }
 }
 
@@ -238,33 +233,37 @@ class _FeaturedSpot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return SoftCard(
-      onTap: () => showDirections(context, place),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _iconTile(place.category.icon),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(place.name, style: t.titleMedium),
-                const SizedBox(height: 2),
-                Row(children: [
-                  Text('${place.area} · ', style: t.bodySmall),
-                  const Icon(Icons.star, size: 14, color: AppColors.star),
-                  Text(' ${place.rating}', style: t.bodySmall),
-                ]),
-                const SizedBox(height: 6),
-                Text(place.description,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: t.bodyMedium),
-              ],
+    return SizedBox(
+      width: 210,
+      child: SoftCard(
+        onTap: () => showDirections(context, place),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _iconTile(place.category.icon),
+            const SizedBox(height: 12),
+            Text(place.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: t.titleMedium),
+            const SizedBox(height: 3),
+            Row(children: [
+              Flexible(
+                  child: Text(place.area,
+                      overflow: TextOverflow.ellipsis, style: t.bodySmall)),
+              const SizedBox(width: 4),
+              const Icon(Icons.star, size: 13, color: AppColors.star),
+              Text(' ${place.rating}', style: t.bodySmall),
+            ]),
+            const SizedBox(height: 6),
+            Expanded(
+              child: Text(place.description,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: t.bodyMedium),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

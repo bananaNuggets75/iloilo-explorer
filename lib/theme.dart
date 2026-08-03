@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// SuroyIloilo visual system — warm cream + terracotta with serif display
-/// headings, matching the pilot design.
+/// SuroyIloilo visual system — the Dayon app look: ink, teal and signboard
+/// yellow on a cool paper ground, with a bold condensed display face. This
+/// replaced an earlier cream/serif "editorial" theme that read as a blog,
+/// not an app.
 class AppColors {
-  static const cream = Color(0xFFFBF6EC); // page background
-  static const surface = Color(0xFFFFFDF9); // cards
-  static const rust = Color(0xFFA8482B); // primary / accents
-  static const rustDark = Color(0xFF8F3C22);
-  static const ink = Color(0xFF241E1B); // headings / dark text
-  static const muted = Color(0xFF6B5F57); // secondary text
-  static const chip = Color(0xFFF0E7D8); // soft chip background
-  static const chipInk = Color(0xFF5A4A3C);
-  static const priceBg = Color(0xFFDCE7DA); // green price pill
-  static const priceInk = Color(0xFF3B6B4A);
-  static const line = Color(0xFFEDE3D3); // hairline dividers
+  static const cream = Color(0xFFF4F6F5); // page background (cool paper)
+  static const surface = Color(0xFFFFFFFF); // cards
+  static const rust = Color(0xFF0D8E5F); // primary / accents (teal)
+  static const rustDark = Color(0xFF096B47);
+  static const ink = Color(0xFF16232A); // headings / dark text
+  static const muted = Color(0xFF5B6B70); // secondary text
+  static const chip = Color(0xFFE3EFEA); // soft chip background
+  static const chipInk = Color(0xFF115C43);
+  static const priceBg = Color(0xFFFCEBBE); // signboard-yellow price pill
+  static const priceInk = Color(0xFF7A5A0A);
+  static const line = Color(0xFFE1E7E6); // hairline dividers
   static const star = Color(0xFFE0A32E);
+  static const signboard = Color(0xFFF6BE3F); // signage yellow accent
 }
 
 class AppTheme {
@@ -31,24 +34,21 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.cream,
     );
 
-    const display = GoogleFonts.fraunces; // high-contrast serif for headings
-    const body = GoogleFonts.instrumentSans; // clean sans for body
+    const display = GoogleFonts.anton; // bold condensed — the app's voice
+    const body = GoogleFonts.archivo; // clean grotesque for body/UI
 
     return base.copyWith(
       textTheme: base.textTheme.copyWith(
-        displaySmall: display(
-            fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.05),
-        headlineMedium: display(
-            fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.1),
-        headlineSmall: display(
-            fontWeight: FontWeight.w600, color: AppColors.ink, height: 1.15),
-        titleLarge: display(fontWeight: FontWeight.w600, color: AppColors.ink),
-        titleMedium:
-            body(fontWeight: FontWeight.w600, color: AppColors.ink, fontSize: 16),
+        displaySmall: display(color: AppColors.ink, height: 1.02),
+        headlineMedium: display(color: AppColors.ink, height: 1.05),
+        headlineSmall: display(color: AppColors.ink, height: 1.08),
+        titleLarge: display(color: AppColors.ink, height: 1.1),
+        titleMedium: body(
+            fontWeight: FontWeight.w700, color: AppColors.ink, fontSize: 16),
         bodyLarge: body(color: AppColors.ink, height: 1.4),
         bodyMedium: body(color: AppColors.muted, height: 1.4),
         bodySmall: body(color: AppColors.muted),
-        labelLarge: body(fontWeight: FontWeight.w600),
+        labelLarge: body(fontWeight: FontWeight.w700),
       ),
       dividerColor: AppColors.line,
       cardTheme: const CardThemeData(
@@ -78,15 +78,22 @@ class SoftCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: color ?? AppColors.surface,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(18),
             border: Border.all(color: AppColors.line),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x0A0F1A16),
+                blurRadius: 10,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
           child: child,
         ),
@@ -122,7 +129,7 @@ class Pill extends StatelessWidget {
           ],
           Text(text,
               style: TextStyle(
-                  color: fg, fontWeight: FontWeight.w600, fontSize: 13)),
+                  color: fg, fontWeight: FontWeight.w700, fontSize: 13)),
         ],
       ),
     );
@@ -130,7 +137,9 @@ class Pill extends StatelessWidget {
 }
 
 /// Dayon UI-kit tokens (from the v0.1 design kit) — used by the landing
-/// screen and the jeepney signboard plates.
+/// screen and the jeepney signboard plates. The main AppColors palette above
+/// now draws from the same family, so this exists mainly for the pure-ink
+/// landing screen background and the plate widget below.
 class DayonColors {
   static const ink = Color(0xFF1A2B2E);
   static const teal = Color(0xFF0D8E5F);
@@ -191,8 +200,11 @@ class SectionIntro extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(eyebrow.toUpperCase(),
-            style: t.labelLarge?.copyWith(
-                color: AppColors.rust, letterSpacing: 1.5, fontSize: 12)),
+            style: GoogleFonts.archivo(
+                color: AppColors.rust,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+                fontSize: 12)),
         const SizedBox(height: 10),
         Text(title, style: t.headlineMedium?.copyWith(fontSize: 30)),
         const SizedBox(height: 10),

@@ -13,8 +13,8 @@ void main() {
     await tester.pumpWidget(const SuroyIloiloApp());
     await tester.pump();
 
-    expect(find.textContaining('Explore Iloilo like a local'), findsOneWidget);
-    expect(find.text('Start exploring'), findsOneWidget);
+    expect(find.textContaining('Where in Iloilo'), findsOneWidget);
+    expect(find.text('Plan my day'), findsOneWidget);
   });
 
   testWidgets('Tapping the Places tab shows the places header',
@@ -62,9 +62,9 @@ void main() {
         .first;
 
     await tester.tap(find.text('Molo Mansion'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.text('Build my plan (1)'), 100,
+    await tester.scrollUntilVisible(find.text('Build my plan (1)'), 200,
         scrollable: planScrollable);
     await tester.tap(find.text('Build my plan (1)'));
     await tester.pumpAndSettle();

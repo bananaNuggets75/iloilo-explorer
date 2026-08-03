@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import '../data/location_helper.dart';
+import '../data/routing_service.dart';
 import '../models.dart';
 import '../theme.dart';
 
@@ -65,32 +63,20 @@ class _RouteMapState extends State<RouteMap> {
   Future<void> _fetchRoute() async {
     final u = _user;
     if (u == null) return;
-    try {
-      // Public OSRM demo server — free, keyless. Road geometry only; the
-      // jeepney intelligence stays in our own route data below the map.
-      final url = 'https://router.project-osrm.org/route/v1/driving/'
-          '${u.longitude},${u.latitude};${_dest.longitude},${_dest.latitude}'
-          '?overview=full&geometries=geojson';
-      final res =
-          await http.get(Uri.parse(url)).timeout(const Duration(seconds: 12));
-      if (res.statusCode != 200) throw Exception('OSRM ${res.statusCode}');
-      final body = json.decode(res.body) as Map<String, dynamic>;
-      final route = (body['routes'] as List).first as Map<String, dynamic>;
-      final coords = ((route['geometry']
-              as Map<String, dynamic>)['coordinates'] as List)
-          .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
-          .toList(growable: false);
-      if (!mounted) return;
-      setState(() {
-        _path = coords;
-        _km = (route['distance'] as num).toDouble() / 1000;
-        _mins = (route['duration'] as num).toDouble() / 60;
-        _status = '';
-      });
-    } catch (_) {
-      if (!mounted) return;
+    // Road geometry from OSRM (free, keyless). The jeepney intelligence stays
+    // in our own route data below the map.
+    final route = await RoutingService().fetch(u, _dest);
+    if (!mounted) return;
+    if (route == null) {
       setState(() => _status = 'Route line unavailable — pins only');
+      return;
     }
+    setState(() {
+      _path = route.points;
+      _km = route.km;
+      _mins = route.minutes;
+      _status = '';
+    });
   }
 
   @override

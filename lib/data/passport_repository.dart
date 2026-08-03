@@ -116,12 +116,18 @@ class PassportRepository {
     return CheckInResult(CheckInStatus.stamped, distance);
   }
 
+  /// Pesos saved versus a taxi for a given jeepney fare label, e.g.
+  /// "₱13–₱15" -> 137. Pure and clamped; exposed for testing.
+  static int fareSaved(String fareLabel) {
+    final m = RegExp(r'(\d+)').firstMatch(fareLabel);
+    final fare = m != null ? int.parse(m.group(1)!) : 13;
+    return (taxiEstimatePesos - fare).clamp(0, taxiEstimatePesos);
+  }
+
   /// Log a jeepney ride from a route card; returns (pesos saved this ride,
   /// cumulative saved).
   Future<(int, int)> logRide(String fareLabel) async {
-    final m = RegExp(r'(\d+)').firstMatch(fareLabel);
-    final fare = m != null ? int.parse(m.group(1)!) : 13;
-    final saved = (taxiEstimatePesos - fare).clamp(0, taxiEstimatePesos);
+    final saved = fareSaved(fareLabel);
     final prefs = await SharedPreferences.getInstance();
     final rides = (prefs.getInt(_ridesKey) ?? 0) + 1;
     final total = (prefs.getInt(_savedKey) ?? 0) + saved;

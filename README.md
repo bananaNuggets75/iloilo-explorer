@@ -28,6 +28,14 @@ keyless maps URL. The in-sheet map is a **placeholder** — live, Grab-style
 in-app navigation (current location → destination with the route drawn on
 the map) comes once Google Maps API credentials are added.
 
+## Documentation
+
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — system, data-flow, API,
+  sequence, ER and navigation diagrams
+- [docs/SECURITY.md](docs/SECURITY.md) — secrets, Row Level Security, privacy
+- [docs/TESTING.md](docs/TESTING.md) — the test pyramid and how to run it
+- [PROJECT.md](PROJECT.md) — product brief, roadmap and revenue thinking
+
 ## Project structure
 
 ```

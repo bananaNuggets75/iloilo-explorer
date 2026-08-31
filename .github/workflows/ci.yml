@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # .env.local is git-ignored (holds secrets) but is a declared asset, so
+      # CI must provide the file for analyze/build. Empty → isConfigured is
+      # false and the app runs on bundled seed data, which is what CI verifies.
+      - run: touch .env.local
       - uses: subosito/flutter-action@v2
         with:
           channel: stable

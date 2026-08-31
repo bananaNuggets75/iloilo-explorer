@@ -24,6 +24,7 @@ class RouteMap extends StatefulWidget {
 }
 
 class _RouteMapState extends State<RouteMap> {
+  final _mapController = MapController();
   LatLng? _user;
   List<LatLng> _path = const [];
   double? _km;
@@ -47,6 +48,7 @@ class _RouteMapState extends State<RouteMap> {
     final result = await fastPosition(accuracy: LocationAccuracy.medium);
     if (!mounted) return;
     if (!result.ok) {
+      // Location failed — the map still shows the destination (see build()).
       setState(() {
         _failure = result.failure;
         _status = result.hint;
@@ -57,7 +59,25 @@ class _RouteMapState extends State<RouteMap> {
       _user = LatLng(result.position!.latitude, result.position!.longitude);
       _status = 'Drawing the route…';
     });
+    _fitToContent();
     await _fetchRoute();
+  }
+
+  /// Frames the destination together with the user and route when we have
+  /// them. With only the destination we keep the initial centered zoom — a
+  /// single-point "fit" produces an invalid zoom and blanks the tiles.
+  void _fitToContent() {
+    final points = <LatLng>[_dest, if (_user != null) _user!, ..._path];
+    if (points.length < 2) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      try {
+        _mapController.fitCamera(CameraFit.coordinates(
+          coordinates: points,
+          padding: const EdgeInsets.all(40),
+        ));
+      } catch (_) {/* map not ready yet — the next fit will catch up */}
+    });
   }
 
   Future<void> _fetchRoute() async {
@@ -77,6 +97,7 @@ class _RouteMapState extends State<RouteMap> {
       _mins = route.minutes;
       _status = '';
     });
+    _fitToContent();
   }
 
   @override
@@ -114,14 +135,14 @@ class _RouteMapState extends State<RouteMap> {
         child: Stack(
           children: [
             FlutterMap(
+              mapController: _mapController,
               options: MapOptions(
-                initialCameraFit: _user == null
-                    ? CameraFit.coordinates(
-                        coordinates: [_dest], padding: const EdgeInsets.all(48))
-                    : CameraFit.coordinates(
-                        coordinates: [_dest, _user!],
-                        padding: const EdgeInsets.all(48),
-                      ),
+                // Always a valid center + zoom so tiles render even before
+                // (or without) a location fix. fitCamera reframes later.
+                initialCenter: _dest,
+                initialZoom: 15,
+                minZoom: 3,
+                maxZoom: 18,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.drag | InteractiveFlag.pinchZoom,
                 ),
@@ -130,6 +151,7 @@ class _RouteMapState extends State<RouteMap> {
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'ph.suroyiloilo.app',
+                  maxZoom: 19,
                 ),
                 if (_path.isNotEmpty)
                   PolylineLayer(polylines: [

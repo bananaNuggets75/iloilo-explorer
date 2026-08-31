@@ -96,10 +96,20 @@ app's name on it.
 
 ## Roadmap
 
-1. **GPS + real map — NEXT**
-   flutter_map + OpenStreetMap (free, keyless) in the directions sheet: your
-   location, destination pin, route line, ETA — jeepney guide underneath.
-   Also unlocks passport check-ins.
+1. **GPS + real map — DONE (v1), Grab-style v2 planned**
+   v1 (shipped): flutter_map + OpenStreetMap (free, keyless) in the directions
+   sheet — destination pin always shown, your location + route line + ETA when
+   GPS is available, jeepney guide underneath. Also unlocks passport check-ins.
+
+   **Directions v2 — the Grab-style experience (planned):**
+   - Prompt to enable device location up front (open OS location settings on
+     mobile; on web guide the browser permission — sites cannot force it open).
+   - Show **origin (you) → destination** clearly, recentre live as you move.
+   - Offer **mode options** — jeepney (our fare data), walk, and Grab/taxi
+     estimate — and let the user pick, like a trip-options list.
+   - Turn-by-turn style guidance for the walking legs; our jeepney steps for
+     the ride legs. (Needs the corridor route model from step 4 to be truly
+     multi-modal from any origin.)
 
 2. **Suroy Passport — NEXT**
    Check-in stamps, badges, fare-saved counter. The anonymous device id

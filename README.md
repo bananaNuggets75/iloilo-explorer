@@ -30,6 +30,8 @@ the map) comes once Google Maps API credentials are added.
 
 ## Documentation
 
+- [docs/PROJECT_PLAN.md](docs/PROJECT_PLAN.md) — plan, feasibility study,
+  pilot testing, deployment readiness, data plan, KPIs and risks
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — system, data-flow, API,
   sequence, ER and navigation diagrams
 - [docs/SECURITY.md](docs/SECURITY.md) — secrets, Row Level Security, privacy
